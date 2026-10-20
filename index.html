@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#17211d">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#12261d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fit-Out Reports">
 <title>Fit-Out Daily Report System</title>
 <style>
 :root{--ink:#17211d;--muted:#69736d;--line:#dfe5e1;--paper:#fff;--bg:#f3f5f3;--accent:#254d3b;--soft:#e8efe9;--warn:#fff4d8;--danger:#a52d2d}
@@ -26,6 +30,52 @@ label{display:block;font-weight:650;font-size:13px;margin-bottom:5px}input,selec
 #loginScreen{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
 #loginScreen .panel{width:100%;max-width:380px;margin:0}
 #loginError{color:var(--danger);font-size:13px;min-height:18px;margin:10px 0 0}
+/* ui-upgrade */
+:root{--bg:#f2f5f3;--accent:#1f6f50;--accent-d:#17543c;--soft:#e6f2ec;--line:#e1e8e4;--r:16px;--sh:0 1px 2px #10231a0d,0 8px 24px -8px #10231a1f}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:radial-gradient(1200px 400px at 50% -120px,#dcebe3,transparent),var(--bg);-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:30;background:linear-gradient(135deg,#12261d,#1f4d3a);padding-top:max(14px,env(safe-area-inset-top));padding-bottom:14px;box-shadow:0 4px 18px -6px #0b1a1380}
+.brand{font-size:17px;letter-spacing:.6px}.subbrand{opacity:.8}
+header .small{text-align:right;line-height:1.5;color:#d4e3da}
+.wrap{margin-top:18px}
+button,.button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;transition:transform .12s,box-shadow .2s,background .2s,opacity .2s;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px #10231a26}
+button:hover,.button:hover{background:var(--accent-d)}button.secondary:hover,.button.secondary:hover{background:#f4f8f5}button.danger:hover{background:#ffe6e6}
+button:active,.button:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #1f6f5040;outline-offset:2px}
+.panel{border-radius:var(--r);box-shadow:var(--sh);border-color:var(--line);padding:24px}
+h1{font-size:24px;letter-spacing:-.3px}
+input,select,textarea{font-size:16px;min-height:46px;border-radius:12px;border-color:#d3ddd7;transition:border-color .2s,box-shadow .2s,background .2s}
+textarea{min-height:110px}input:hover,select:hover,textarea:hover{border-color:#aebdb4}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px #1f6f5022}
+label{color:#33433b}
+.nav{gap:6px;background:#e6ece8;padding:5px;border-radius:14px;width:fit-content;max-width:100%}
+.nav button{border:0;background:transparent;color:#52645a;box-shadow:none;border-radius:10px;min-height:40px}
+.nav button:hover{background:#ffffff90}.nav button.active{background:#fff;color:var(--accent-d);box-shadow:0 1px 4px #10231a26}
+section:not(.hidden){animation:fadeUp .28s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.notice{background:var(--soft);color:#24533f;border:1px solid #cfe4d9;border-radius:12px}
+.report-item{padding:16px;margin:0 0 10px;border:1px solid var(--line);border-radius:14px;background:#fff;transition:box-shadow .2s,transform .2s}
+.report-item:hover{box-shadow:var(--sh);transform:translateY(-1px)}.report-item:last-child{border-bottom:1px solid var(--line)}
+.pill{border-radius:999px;font-weight:650}
+.photo-box{border-radius:14px;border-color:#b7cdc0;background:#f7fbf8;transition:background .2s,border-color .2s}.photo-box:hover{background:#eef6f1;border-color:var(--accent)}
+.photo img{transition:transform .25s}.photo:hover img{transform:scale(1.03)}
+.empty{border-radius:14px}
+#loginScreen{background:radial-gradient(900px 500px at 50% -10%,#cfe6da,transparent),linear-gradient(160deg,#f2f5f3,#e3eee8)}
+#loginScreen .panel{padding:30px 26px;box-shadow:0 20px 50px -20px #10231a55}
+#loginScreen h1{font-size:22px;letter-spacing:.4px}
+#loginBtn{width:100%}
+#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom));z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;width:calc(100% - 32px);max-width:420px;pointer-events:none}
+.toast{background:#14241c;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;box-shadow:0 10px 30px -8px #000a;animation:toastIn .25s ease both}.toast.out{animation:toastOut .25s ease both}.toast.err{background:#a52d2d}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes toastOut{to{opacity:0;transform:translateY(8px)}}
+@media(max-width:700px){
+ .wrap{padding:0 12px;padding-bottom:96px}.panel{padding:18px;border-radius:14px}.grid,.grid3{grid-template-columns:1fr}
+ header{padding-left:16px;padding-right:16px}.subbrand{display:none}
+ .nav{position:fixed;left:0;right:0;bottom:0;z-index:40;width:100%;border-radius:18px 18px 0 0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:#ffffffee;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 -6px 24px -8px #10231a33;display:grid;grid-template-columns:repeat(4,1fr);margin:0}
+ .nav button{font-size:11.5px;padding:8px 2px;line-height:1.15;min-height:48px;flex-direction:column}
+ .nav button.active{background:var(--soft)}footer{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+@media print{header{position:static;box-shadow:none}.nav,#toasts{display:none!important}}
 </style>
 </head>
 <body>
@@ -48,10 +98,10 @@ label{display:block;font-weight:650;font-size:13px;margin-bottom:5px}input,selec
 <main class="wrap">
   <div class="notice no-print"><b>Cloud sync:</b> reports and photos are saved to your private online account, so the same data shows on your phone and your computer. An internet connection is needed to save and view reports.</div>
   <div class="nav no-print">
-    <button class="active" data-tab="new">＋ New report</button>
-    <button data-tab="records">Report history</button>
-    <button data-tab="monthly">Monthly PDF</button>
-    <button data-tab="backup">Backup / restore</button>
+    <button class="active" data-tab="new"><span aria-hidden="true">✚</span>New report</button>
+    <button data-tab="records"><span aria-hidden="true">☰</span>History</button>
+    <button data-tab="monthly"><span aria-hidden="true">▤</span>Monthly PDF</button>
+    <button data-tab="backup"><span aria-hidden="true">⇅</span>Backup</button>
   </div>
 
   <section id="tab-new">
@@ -132,6 +182,10 @@ label{display:block;font-weight:650;font-size:13px;margin-bottom:5px}input,selec
   </section>
   <footer>Fit-Out Daily Report System • Cloud sync • Keep occasional backups</footer>
 </main>
+<div id="toasts" aria-live="polite"></div>
+<script>
+window.alert=function(m){const box=document.getElementById('toasts');if(!box)return;const t=document.createElement('div');const msg=String(m);t.className='toast'+(/could not|error|fail|cannot|over \d/i.test(msg)?' err':'');t.textContent=msg;box.appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300)},msg.length>60?5000:2800)};
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2"></script>
 <script>
 let currentPhotos=[], currentTab='new';
