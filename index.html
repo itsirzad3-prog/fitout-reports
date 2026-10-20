@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17211d">
+<title>Fit-Out Daily Report System</title>
+<style>
+:root{--ink:#17211d;--muted:#69736d;--line:#dfe5e1;--paper:#fff;--bg:#f3f5f3;--accent:#254d3b;--soft:#e8efe9;--warn:#fff4d8;--danger:#a52d2d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--ink);color:#fff;padding:20px max(16px,calc((100vw - 1120px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-size:19px;font-weight:750;letter-spacing:.2px}.subbrand{font-size:12px;color:#c4d0c8}
+.wrap{max-width:1120px;margin:22px auto;padding:0 16px}.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+button,.button{border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:650;cursor:pointer;background:var(--accent);color:white}
+button.secondary,.button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}button.danger{background:#fff0f0;color:var(--danger);border:1px solid #f0cccc}button:disabled{opacity:.5;cursor:not-allowed}
+.nav button{background:#fff;color:var(--muted);border:1px solid var(--line)}.nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px #17211d08}
+h1,h2,h3{line-height:1.25;margin:0 0 12px}h1{font-size:25px}h2{font-size:19px}h3{font-size:15px}
+.muted{color:var(--muted)}.small{font-size:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+label{display:block;font-weight:650;font-size:13px;margin-bottom:5px}input,select,textarea{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid #cfd8d1;border-radius:8px;padding:10px 11px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #254d3b18}textarea{min-height:95px;resize:vertical}.field{min-width:0}.field.full{grid-column:1/-1}.required{color:#b12c2c}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.stat{padding:15px;background:var(--soft);border-radius:10px}.stat b{font-size:25px;display:block}.stat span{font-size:12px;color:var(--muted)}
+.photo-box{border:1.5px dashed #b9c7bd;border-radius:10px;padding:15px;background:#fbfcfb}.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px}.photo{position:relative;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#f5f5f5}.photo img{width:100%;height:105px;object-fit:cover;display:block}.photo input{border:0;border-radius:0;font-size:12px;padding:7px}.photo button{position:absolute;top:5px;right:5px;padding:4px 7px;border-radius:6px;background:#fff;color:#9b2222}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:end}.toolbar .field{flex:1;min-width:150px}.report-item{padding:15px 0;border-bottom:1px solid var(--line)}.report-item:last-child{border-bottom:0}.item-top{display:flex;justify-content:space-between;gap:10px;align-items:start}.pill{display:inline-block;font-size:11px;font-weight:700;border-radius:30px;padding:4px 8px;background:#edf1ee;color:#45564a}.pill.open{background:#fff0d2;color:#805300}.pill.done{background:#e0f3e5;color:#1f6735}.hidden{display:none!important}.notice{padding:12px 14px;border-radius:9px;background:var(--warn);font-size:13px;margin-bottom:14px}.empty{text-align:center;padding:35px 10px;color:var(--muted)}footer{text-align:center;color:var(--muted);font-size:12px;padding:15px 0 30px}
+@media(max-width:650px){.grid,.grid3{grid-template-columns:1fr}.panel{padding:15px}.wrap{margin-top:14px}.item-top{display:block}.item-top .pill{margin-top:7px}header{padding:16px}.brand{font-size:17px}}
+@media print{body{background:#fff}.no-print,header,.nav,footer{display:none!important}.wrap{max-width:none;margin:0;padding:0}.panel{box-shadow:none;border:0;padding:0}.print-only{display:block!important}}
+#loginScreen{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+#loginScreen .panel{width:100%;max-width:380px;margin:0}
+#loginError{color:var(--danger);font-size:13px;min-height:18px;margin:10px 0 0}
+</style>
+</head>
+<body>
+<div id="loginScreen">
+  <div class="panel">
+    <h1>Fit-Out Daily Report</h1>
+    <p class="muted">Sign in to open your reports.</p>
+    <form id="loginForm">
+      <div class="field"><label for="loginEmail">Email</label><input type="email" id="loginEmail" autocomplete="username" required></div>
+      <div class="field" style="margin-top:12px"><label for="loginPassword">Password</label><input type="password" id="loginPassword" autocomplete="current-password" required></div>
+      <div class="actions"><button type="submit" id="loginBtn">Sign in</button></div>
+      <p id="loginError" role="alert"></p>
+    </form>
+  </div>
+</div>
+<header>
+  <div><div class="brand">FIT-OUT DAILY REPORT</div><div class="subbrand">Site activity • photographic records • monthly summary</div></div>
+  <div class="small"><span id="todayLabel"></span><br><span id="userEmail"></span> <a href="#" id="logoutBtn" style="color:inherit;text-decoration:underline">Sign out</a></div>
+</header>
+<main class="wrap">
+  <div class="notice no-print"><b>Cloud sync:</b> reports and photos are saved to your private online account, so the same data shows on your phone and your computer. An internet connection is needed to save and view reports.</div>
+  <div class="nav no-print">
+    <button class="active" data-tab="new">＋ New report</button>
+    <button data-tab="records">Report history</button>
+    <button data-tab="monthly">Monthly PDF</button>
+    <button data-tab="backup">Backup / restore</button>
+  </div>
+
+  <section id="tab-new">
+    <div class="panel">
+      <h1 id="formTitle">Create daily site report</h1>
+      <p class="muted">Complete the activity details and attach photos from your phone or computer.</p>
+      <form id="reportForm">
+        <input type="hidden" id="reportId">
+        <div class="grid">
+          <div class="field"><label for="workType">Type of work <span class="required">*</span></label>
+            <select id="workType" required><option value="">Select activity</option><option>Site Inspection</option><option>Work Progress Monitoring</option><option>Site Discussion / Coordination</option><option>Rectification / Defect Inspection</option><option>Tenant Fit-Out Work</option><option>Handover Inspection</option><option>Other</option></select></div>
+          <div class="field"><label for="site">Site / building <span class="required">*</span></label><input id="site" value="Plaza Merdeka Mall" required></div>
+          <div class="field"><label for="lot">Lot number</label><input id="lot" placeholder="e.g. L2-XX"></div>
+          <div class="field"><label for="tenant">Tenant name <span class="required">*</span></label><input id="tenant" placeholder="Tenant / shop name" required></div>
+          <div class="field"><label for="contractor">Contractor</label><input id="contractor" placeholder="Contractor company"></div>
+          <div class="field"><label for="date">Date <span class="required">*</span></label><input type="date" id="date" required></div>
+          <div class="field"><label for="startTime">Start time</label><input type="time" id="startTime"></div>
+          <div class="field"><label for="endTime">End time</label><input type="time" id="endTime"></div>
+          <div class="field"><label for="status">Work status <span class="required">*</span></label><select id="status" required><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option><option value="Pending rectification">Pending rectification</option><option value="Pending management decision">Pending management decision</option><option value="On hold">On hold</option></select></div>
+          <div class="field"><label for="responsible">Person responsible / follow-up</label><input id="responsible" placeholder="Name / department / contractor"></div>
+          <div class="field full"><label for="description">Description / site observations <span class="required">*</span></label><textarea id="description" required placeholder="Describe work carried out, inspection findings, issues discussed or progress observed..."></textarea></div>
+          <div class="field full"><label for="action">Action required / remarks</label><textarea id="action" placeholder="Required rectification, deadline, management decision or next action..."></textarea></div>
+          <div class="field full">
+            <label>Site photos</label>
+            <div class="photo-box">
+              <input type="file" id="photoInput" accept="image/*" capture="environment" multiple>
+              <p class="muted small">On a phone, choose photos from your library or use the camera option if your browser offers it. Photos are resized automatically and saved with the report in your private cloud storage.</p>
+              <div id="photoGrid" class="photo-grid"></div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" id="saveBtn">Save report</button>
+          <button type="button" class="secondary" id="resetBtn">Clear form</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="tab-records" class="hidden">
+    <div class="panel">
+      <h1>Report history</h1>
+      <div class="toolbar">
+        <div class="field"><label for="searchText">Search</label><input id="searchText" placeholder="Tenant, lot, contractor, description"></div>
+        <div class="field"><label for="filterMonth">Month</label><input type="month" id="filterMonth"></div>
+        <div class="field"><label for="filterStatus">Status</label><select id="filterStatus"><option value="">All statuses</option><option>Ongoing</option><option>Completed</option><option>Pending rectification</option><option>Pending management decision</option><option>On hold</option></select></div>
+        <button type="button" class="secondary" id="clearFilters">Clear filters</button>
+      </div>
+      <div id="recordList"></div>
+    </div>
+  </section>
+
+  <section id="tab-monthly" class="hidden">
+    <div class="panel">
+      <h1>Monthly report / PDF</h1>
+      <p class="muted">Choose a month to generate a print-ready report. In the print window, select “Save as PDF”.</p>
+      <div class="grid">
+        <div class="field"><label for="pdfMonth">Reporting month</label><input type="month" id="pdfMonth"></div>
+        <div class="field"><label for="pdfTenant">Tenant</label><select id="pdfTenant"><option value="">All tenants</option></select></div>
+        <div class="field"><label for="pdfLot">Lot number</label><select id="pdfLot"><option value="">All lots</option></select></div>
+        <div class="field"><label for="preparedBy">Prepared by</label><input id="preparedBy" placeholder="Name / Fit-Out Department"></div>
+      </div>
+      <div class="actions"><button id="generatePdf" type="button">Generate monthly PDF</button></div>
+      <div id="monthlyPreview" class="muted small" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section id="tab-backup" class="hidden">
+    <div class="panel">
+      <h1>Backup / restore</h1>
+      <p>Your reports sync automatically between devices when you sign in. You can still download a full backup (reports + photos) as a safety copy, or restore an older backup, including one from the old local version of this app.</p>
+      <div class="actions"><button id="exportBtn" type="button">Download backup</button><label class="button secondary" for="importFile">Restore from backup</label><input class="hidden" type="file" id="importFile" accept=".json,application/json"></div>
+      <p class="muted small">Restore adds the records to your cloud account. If a report ID already exists, the restored record replaces it. Large backups with many photos can take a few minutes.</p>
+      <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+      <h3>Storage information</h3><p id="storageInfo" class="muted small"></p>
+      <div class="actions"><button class="danger" id="deleteAllBtn" type="button">Delete all reports</button></div>
+    </div>
+  </section>
+  <footer>Fit-Out Daily Report System • Cloud sync • Keep occasional backups</footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2"></script>
+<script>
+let currentPhotos=[], currentTab='new';
+const $=id=>document.getElementById(id);
+const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const monthISO=()=>todayISO().slice(0,7);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SUPABASE_URL='https://suqzvpiizqoilqgubkdc.supabase.co';
+const SUPABASE_KEY='sb_publishable_E-6WSKV8XhXMgTdbCChLpQ_e61loxTQ';
+const BUCKET='report-photos';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let cache=[],uid=null,cacheTime=0;
+async function compressImage(src,maxDim=1600,quality=0.8){
+  const blob=typeof src==='string'?await (await fetch(src)).blob():src;
+  const url=URL.createObjectURL(blob);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('Could not read this image'));i.src=url});
+    const s=Math.min(1,maxDim/Math.max(img.naturalWidth,img.naturalHeight));
+    const w=Math.max(1,Math.round(img.naturalWidth*s)),h=Math.max(1,Math.round(img.naturalHeight*s));
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+    return await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Could not compress image')),'image/jpeg',quality));
+  }finally{URL.revokeObjectURL(url)}
+}
+async function loadReports(){
+  const {data,error}=await sb.from('reports').select('id,data');
+  if(error)throw error;
+  const reports=data.map(row=>row.data);
+  const paths=[...new Set(reports.flatMap(r=>(r.photos||[]).map(p=>p.path).filter(Boolean)))];
+  const urls={};
+  for(let i=0;i<paths.length;i+=100){
+    const {data:signed,error:e2}=await sb.storage.from(BUCKET).createSignedUrls(paths.slice(i,i+100),21600);
+    if(e2)throw e2;
+    (signed||[]).forEach(s=>{if(s.signedUrl)urls[s.path]=s.signedUrl});
+  }
+  reports.forEach(r=>(r.photos||[]).forEach(p=>{p.data=p.path?(urls[p.path]||''):''}));
+  cache=reports.sort((a,b)=>((b.date||'')+(b.createdAt||'')).localeCompare((a.date||'')+(a.createdAt||'')));
+  cacheTime=Date.now();
+  return cache;
+}
+const allReports=async()=>cache;
+async function putReport(r){
+  const old=cache.find(x=>x.id===r.id);
+  const photos=[];
+  for(const p of (r.photos||[])){
+    let path=p.path;
+    if(p.data&&p.data.startsWith('data:')){
+      let blob=await (await fetch(p.data)).blob();
+      if(blob.size>1500000)blob=await compressImage(blob);
+      path=`${uid}/${r.id}/${crypto.randomUUID()}.jpg`;
+      const {error}=await sb.storage.from(BUCKET).upload(path,blob,{contentType:blob.type||'image/jpeg'});
+      if(error)throw error;
+    }
+    if(path)photos.push({name:p.name||'',caption:p.caption||'',path});
+  }
+  const stored={...r,photos};
+  const {error}=await sb.from('reports').upsert({id:r.id,data:stored,updated_at:new Date().toISOString()});
+  if(error)throw error;
+  if(old){const keep=new Set(photos.map(p=>p.path));const gone=(old.photos||[]).map(p=>p.path).filter(x=>x&&!keep.has(x));if(gone.length)await sb.storage.from(BUCKET).remove(gone)}
+  await loadReports();
+}
+async function deleteReport(id){
+  try{
+    const old=cache.find(x=>x.id===id);
+    const paths=(old?.photos||[]).map(p=>p.path).filter(Boolean);
+    const {error}=await sb.from('reports').delete().eq('id',id);
+    if(error)throw error;
+    if(paths.length)await sb.storage.from(BUCKET).remove(paths);
+    cache=cache.filter(x=>x.id!==id);
+  }catch(e){alert('Could not delete: '+(e.message||e));throw e}
+}
+const refreshThen=fn=>{fn();if(uid)loadReports().then(fn).catch(()=>{})};
+const readFile=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
+function setTab(tab){currentTab=tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));['new','records','monthly','backup'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==tab));if(tab==='records')refreshThen(renderRecords);if(tab==='monthly')refreshThen(updateMonthlyPreview);if(tab==='backup')updateStorageInfo();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+function renderPhotos(){const g=$('photoGrid');g.innerHTML='';currentPhotos.forEach((p,i)=>{const el=document.createElement('div');el.className='photo';el.innerHTML=`<img src="${p.data}" alt="Site photo ${i+1}"><input aria-label="Photo caption" placeholder="Photo caption" value="${esc(p.caption||'')}" data-caption="${i}"><button type="button" title="Remove photo" data-remove="${i}">×</button>`;g.appendChild(el)});g.querySelectorAll('[data-caption]').forEach(inp=>inp.addEventListener('input',e=>{currentPhotos[Number(e.target.dataset.caption)].caption=e.target.value}));g.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>{currentPhotos.splice(Number(btn.dataset.remove),1);renderPhotos()}))}
+$('photoInput').addEventListener('change',async e=>{const files=[...e.target.files];for(const file of files){if(!file.type.startsWith('image/'))continue;if(file.size>12*1024*1024){alert(`${file.name} is over 12 MB. Please choose a smaller image.`);continue}try{currentPhotos.push({name:file.name,data:await readFile(await compressImage(file)),caption:''})}catch{alert('Could not read one of the selected images.')}}renderPhotos();e.target.value=''});
+function formData(){return {workType:$('workType').value,site:$('site').value.trim(),lot:$('lot').value.trim(),tenant:$('tenant').value.trim(),contractor:$('contractor').value.trim(),date:$('date').value,startTime:$('startTime').value,endTime:$('endTime').value,status:$('status').value,responsible:$('responsible').value.trim(),description:$('description').value.trim(),action:$('action').value.trim(),photos:currentPhotos}}
+function resetForm(){ $('reportForm').reset();$('reportId').value='';$('site').value='Plaza Merdeka Mall';$('date').value=todayISO();currentPhotos=[];renderPhotos();$('formTitle').textContent='Create daily site report';$('saveBtn').textContent='Save report'}
+$('resetBtn').addEventListener('click',resetForm);
+$('reportForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('reportId').value||crypto.randomUUID();const existing=(await allReports()).find(r=>r.id===id);const r={id,...formData(),createdAt:existing?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};const btn=$('saveBtn');btn.disabled=true;btn.textContent='Saving…';try{await putReport(r);alert('Report saved successfully.');resetForm();setTab('records')}catch(err){console.error(err);alert('Could not save: '+(err.message||err)+'. Check your internet connection and try again.')}finally{btn.disabled=false;btn.textContent=$('reportId').value?'Update report':'Save report'}});
+function statusClass(s){return s==='Completed'?'done':(s==='Ongoing'?'open':'')}
+function renderRecords(){const list=$('recordList');allReports().then(reports=>{const q=$('searchText').value.toLowerCase().trim(),m=$('filterMonth').value,s=$('filterStatus').value;const filtered=reports.filter(r=>(!m||r.date?.startsWith(m))&&(!s||r.status===s)&&(!q||[r.tenant,r.lot,r.contractor,r.description,r.action,r.workType,r.site].join(' ').toLowerCase().includes(q)));list.innerHTML=`<p class="muted small">${filtered.length} report(s)</p>`+(filtered.length?filtered.map(r=>`<article class="report-item"><div class="item-top"><div><h3>${esc(r.workType)} — ${esc(r.tenant)}</h3><div class="muted small">${esc(r.date)}${r.startTime?' • '+esc(r.startTime):''}${r.endTime?'–'+esc(r.endTime):''} • ${esc(r.lot||'No lot entered')}</div></div><span class="pill ${statusClass(r.status)}">${esc(r.status)}</span></div><p>${esc(r.description)}</p><div class="muted small">${esc(r.contractor||'No contractor')} • ${r.photos?.length||0} photo(s)</div><div class="actions"><button class="secondary" data-edit="${r.id}">Edit</button><button class="secondary" data-view="${r.id}">View details</button><button class="danger" data-delete="${r.id}">Delete</button></div><div id="details-${r.id}" class="hidden"></div></article>`).join(''):'<div class="empty">No reports found. Add your first daily report.</div>');list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editReport(b.dataset.edit));list.querySelectorAll('[data-delete]').forEach(b=>b.onclick=async()=>{if(confirm('Delete this report permanently?')){await deleteReport(b.dataset.delete);renderRecords()}});list.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>toggleDetails(b.dataset.view))})}
+async function toggleDetails(id){const r=(await allReports()).find(x=>x.id===id),el=$('details-'+id);if(!r||!el)return;if(!el.classList.contains('hidden')){el.classList.add('hidden');return}el.classList.remove('hidden');el.innerHTML=`<div class="panel" style="margin-top:12px;background:#fafbfa"><p><b>Site:</b> ${esc(r.site)}</p><p><b>Responsible:</b> ${esc(r.responsible||'—')}</p><p><b>Action / remarks:</b><br>${esc(r.action||'—')}</p><div class="photo-grid">${(r.photos||[]).map(p=>`<div class="photo"><img src="${p.data}" alt="Site photo"><div style="padding:7px;font-size:12px">${esc(p.caption||p.name||'Site photo')}</div></div>`).join('')}</div></div>`}
+async function editReport(id){const r=(await allReports()).find(x=>x.id===id);if(!r)return;$('reportId').value=r.id;for(const k of ['workType','site','lot','tenant','contractor','date','startTime','endTime','status','responsible','description','action'])$(k).value=r[k]||'';currentPhotos=(r.photos||[]).map(p=>({...p}));renderPhotos();$('formTitle').textContent='Edit daily site report';$('saveBtn').textContent='Update report';setTab('new')}
+['searchText','filterMonth','filterStatus'].forEach(id=>$(id).addEventListener('input',renderRecords));$('clearFilters').onclick=()=>{$('searchText').value='';$('filterMonth').value='';$('filterStatus').value='';renderRecords()};
+$('pdfMonth').value=monthISO();$('filterMonth').value=monthISO();$('date').value=todayISO();$('todayLabel').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+async function updateMonthlyPreview(){const m=$('pdfMonth').value||monthISO(),all=await allReports();populateReportFilters(all);const rs=filterMonthlyReports(all,m);$('monthlyPreview').textContent=`${rs.length} report(s) for ${new Date(m+'-01T12:00:00').toLocaleDateString(undefined,{month:'long',year:'numeric'})}${$('pdfTenant').value?' • Tenant: '+$('pdfTenant').value:''}${$('pdfLot').value?' • Lot: '+$('pdfLot').value:''}. ${rs.filter(r=>r.status==='Completed').length} completed; ${rs.filter(r=>r.status!=='Completed').length} not marked completed.`}
+function populateReportFilters(reports){const tenantSel=$('pdfTenant'),lotSel=$('pdfLot'),oldTenant=tenantSel.value,oldLot=lotSel.value;const tenants=[...new Set(reports.map(r=>r.tenant).filter(Boolean))].sort((a,b)=>a.localeCompare(b));const lots=[...new Set(reports.map(r=>r.lot).filter(Boolean))].sort((a,b)=>a.localeCompare(b));tenantSel.innerHTML='<option value="">All tenants</option>'+tenants.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');lotSel.innerHTML='<option value="">All lots</option>'+lots.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(tenants.includes(oldTenant))tenantSel.value=oldTenant;if(lots.includes(oldLot))lotSel.value=oldLot}
+function filterMonthlyReports(reports,m){const tenant=$('pdfTenant').value,lot=$('pdfLot').value;return reports.filter(r=>r.date?.startsWith(m)&&(!tenant||r.tenant===tenant)&&(!lot||r.lot===lot))}
+$('pdfMonth').addEventListener('change',updateMonthlyPreview);$('pdfTenant').addEventListener('change',updateMonthlyPreview);$('pdfLot').addEventListener('change',updateMonthlyPreview);
+function fmtMonth(m){return new Date(m+'-01T12:00:00').toLocaleDateString('en-MY',{month:'long',year:'numeric'})}
+function generateReportHTML(m,prepared,rs,scope='All tenants / lots'){const completed=rs.filter(r=>r.status==='Completed').length,open=rs.length-completed;const rows=rs.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.date)}<br>${esc([r.startTime,r.endTime].filter(Boolean).join('–'))}</td><td>${esc(r.lot||'—')}</td><td>${esc(r.tenant)}</td><td>${esc(r.contractor||'—')}</td><td>${esc(r.workType)}</td><td>${esc(r.status)}</td><td>${esc(r.description)}${r.action?'<br><b>Action:</b> '+esc(r.action):''}</td></tr>`).join('');const photos=rs.flatMap(r=>(r.photos||[]).map(p=>({r,p}))).map(({r,p})=>`<figure><img src="${p.data}" alt="Site photo"><figcaption><b>${esc(r.date)} • ${esc(r.lot||'No lot')}</b><br>${esc(r.tenant)} — ${esc(p.caption||p.name||'Site photo')}<br><span>${esc(r.workType)}</span></figcaption></figure>`).join('');const issues=rs.filter(r=>r.status!=='Completed').map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.lot||'—')}</td><td>${esc(r.tenant)}</td><td>${esc(r.status)}</td><td>${esc(r.responsible||'—')}</td><td>${esc(r.action||'Follow-up required')}</td></tr>`).join('');return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fit-Out Monthly Report - ${esc(m)}</title><style>body{font:11px Arial,sans-serif;color:#202820;margin:22px}h1{font-size:22px;margin:0}h2{font-size:15px;border-bottom:1px solid #777;padding-bottom:5px;margin-top:25px}p{line-height:1.5}.meta{color:#555;margin:6px 0 18px}.stats{display:flex;gap:10px;margin:15px 0}.stat{border:1px solid #bbb;padding:10px;flex:1}.stat b{display:block;font-size:19px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #cbd0cc;padding:6px;text-align:left;vertical-align:top}th{background:#edf1ee}figure{display:inline-block;width:45%;margin:8px 2%;vertical-align:top;break-inside:avoid}figure img{width:100%;max-height:290px;object-fit:contain;border:1px solid #ddd}figcaption{font-size:10px;margin-top:5px;line-height:1.5}.page-break{break-before:page}.empty{color:#777}@media print{body{margin:12mm}h2{break-after:avoid}tr,figure{break-inside:avoid}.no-print{display:none}a{color:inherit;text-decoration:none}}</style></head><body><h1>MONTHLY FIT-OUT SITE REPORT</h1><div class="meta">PLAZA MERDEKA MALL • ${esc(fmtMonth(m))}<br>Report scope: ${esc(scope)}${$('pdfLot').value&&$('pdfTenant').value?' • Lot: '+esc($('pdfLot').value):''}<br>Prepared by: ${esc(prepared||'Fit-Out Department')}<br>Generated: ${esc(new Date().toLocaleString())}</div><h2>1. Monthly Summary</h2><div class="stats"><div class="stat"><b>${rs.length}</b>Total reports</div><div class="stat"><b>${completed}</b>Completed</div><div class="stat"><b>${open}</b>Outstanding / other status</div></div><p>This report summarises the site activities recorded for ${esc(fmtMonth(m))}. Status counts reflect the latest saved status of each report.</p><h2>2. Daily Activity Log</h2>${rs.length?`<table><thead><tr><th>No.</th><th>Date / time</th><th>Lot</th><th>Tenant</th><th>Contractor</th><th>Activity</th><th>Status</th><th>Observations / action required</th></tr></thead><tbody>${rows}</tbody></table>`:'<p class="empty">No reports were recorded for this month.</p>'}<h2 class="page-break">3. Photographic Records</h2>${photos||'<p class="empty">No photos attached to reports for this month.</p>'}<h2 class="page-break">4. Outstanding Issues / Follow-up</h2>${issues?`<table><thead><tr><th>Date</th><th>Lot</th><th>Tenant</th><th>Status</th><th>Responsible</th><th>Action required</th></tr></thead><tbody>${issues}</tbody></table>`:'<p>No reports are currently marked as outstanding.</p>'}<h2>5. Closing Summary</h2><p>Review the outstanding items above and follow up with the relevant tenant, contractor or management representative. This report is generated from entries saved in the Daily Fit-Out Report System.</p><p style="margin-top:35px">Prepared by: ____________________________ &nbsp;&nbsp; Reviewed by: ____________________________</p><script>window.onload=()=>setTimeout(()=>window.print(),600)<\/script></body></html>`}
+$('generatePdf').onclick=async()=>{const m=$('pdfMonth').value;if(!m){alert('Please select a reporting month.');return}const rs=filterMonthlyReports(await allReports(),m).sort((a,b)=>(a.date+a.startTime).localeCompare(b.date+b.startTime));const scope=$('pdfTenant').value?`Tenant: ${$('pdfTenant').value}`:($('pdfLot').value?`Lot: ${$('pdfLot').value}`:'All tenants / lots');const w=window.open('','_blank');if(!w){alert('Your browser blocked the report window. Allow pop-ups for this website, then try again.');return}w.document.open();w.document.write(generateReportHTML(m,$('preparedBy').value,rs,scope));w.document.close()};
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+$('exportBtn').onclick=async()=>{const btn=$('exportBtn'),label=btn.textContent;btn.disabled=true;btn.textContent='Preparing backup…';try{const reports=[];for(const r of await allReports()){const photos=[];for(const p of (r.photos||[])){let data=p.data;try{data=await readFile(await (await fetch(p.data)).blob())}catch{}photos.push({name:p.name,caption:p.caption,data})}reports.push({...r,photos})}const data={app:'Fit-Out Daily Report System',version:1,exportedAt:new Date().toISOString(),reports};downloadBlob(new Blob([JSON.stringify(data)],{type:'application/json'}),`fitout-backup-${todayISO()}.json`)}catch(e){alert('Could not create backup: '+(e.message||e))}finally{btn.disabled=false;btn.textContent=label}};
+$('importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.reports))throw new Error('This file does not contain a valid reports list.');if(!confirm(`Import ${data.reports.length} report(s)? Existing records with matching IDs will be replaced.`))return;for(const r of data.reports){if(r.id&&r.date)await putReport(r)}alert('Backup imported successfully.');renderRecords();updateStorageInfo()}catch(err){alert('Could not import backup: '+err.message)}finally{e.target.value=''}});
+async function updateStorageInfo(){const rs=await allReports();const photos=rs.reduce((n,r)=>n+(r.photos?.length||0),0);$('storageInfo').textContent=`${rs.length} saved report(s), ${photos} photo(s). Data is stored in your private cloud account and syncs to every device where you sign in.`}
+$('deleteAllBtn').onclick=async()=>{if(!confirm('Delete ALL reports and photos from your cloud account? This cannot be undone unless you have a backup.'))return;const rs=await allReports();try{for(const r of rs)await deleteReport(r.id)}catch{return}renderRecords();updateStorageInfo();alert('All reports deleted.')};
+async function startApp(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){$('loginScreen').classList.remove('hidden');return}
+  uid=session.user.id;$('userEmail').textContent=session.user.email;$('loginScreen').classList.add('hidden');
+  try{await loadReports();await renderRecords();await updateMonthlyPreview()}catch(e){alert('Could not load your reports: '+(e.message||e));console.error(e)}
+}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('loginBtn');$('loginError').textContent='';btn.disabled=true;btn.textContent='Signing in…';try{const {error}=await sb.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});if(error)throw error;$('loginPassword').value='';await startApp()}catch(err){$('loginError').textContent=err.message||'Could not sign in.'}finally{btn.disabled=false;btn.textContent='Sign in'}});
+$('logoutBtn').addEventListener('click',async e=>{e.preventDefault();await sb.auth.signOut();location.reload()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&uid&&Date.now()-cacheTime>120000){loadReports().then(()=>{if(currentTab==='records')renderRecords()}).catch(()=>{})}});
+startApp();
+</script>
+</body>
+</html>
